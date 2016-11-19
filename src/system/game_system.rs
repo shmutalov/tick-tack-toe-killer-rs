@@ -12,6 +12,8 @@ pub struct Game {
     is_running: bool,
     window: glutin::Window,
     render_system: RenderSystem,
+
+    one_milli_duration: ::std::time::Duration,
 }
 
 impl Game {
@@ -29,13 +31,14 @@ impl Game {
 
         for event in events {
             match event {
+                Event::KeyboardInput(_, _, Some(glutin::VirtualKeyCode::F12)) |
                 Event::Closed => {
                     self.is_running = false;
                     self.render_system.deinitialize();
                 },
                 Event::Resized(w, h) => {
                     self.render_system.resize(&self.window, w, h);
-                }
+                },
                 _ => {},
             }
         }
@@ -50,7 +53,7 @@ impl Game {
 
         while self.is_running {
             self.update();
-            ::std::thread::sleep_ms(1);
+            ::std::thread::sleep(self.one_milli_duration);
         }
     }
 }
@@ -118,6 +121,7 @@ impl GameBuilder {
             is_running: false,
             window: window,
             render_system: render_system,
+            one_milli_duration: ::std::time::Duration::from_millis(1),
         };
 
         game
